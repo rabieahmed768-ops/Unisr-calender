@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-return "OK"
+return "Server Calendario UniSR attivo!"
 
 
 @app.route("/ics")
