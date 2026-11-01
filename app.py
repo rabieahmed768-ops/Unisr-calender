@@ -28,7 +28,7 @@ def generate_ics():
       "titolo": f"Lezione di Fisiologia / Patologia ({linea.upper()})",
       "inizio": datetime(2026, 11, 16, 9, 0, 0),
       "fine": datetime(2026, 11, 16, 12, 0, 0),
-      "aula": "Aula Lezioni - DIBIT
+      "aula": "Aula Lezioni - DIBIT"
     },
     {
       "titolo": f"Laboratorio Clinico ({linea.upper()})",
