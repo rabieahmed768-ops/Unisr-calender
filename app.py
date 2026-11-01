@@ -11,7 +11,6 @@ def home():
 
 @app.route("/ics")
 def generate_ics():
-  # Legge i parametri passati nell'URL (es. /ics?corso=medicina&anno=1)
   corso = request.args.get("corso", "generico").upper()
   anno = request.args.get("anno", "1")
   
@@ -21,9 +20,6 @@ def generate_ics():
   cal.add("calscale", "GREGORIAN")
   cal.add("method", "PUBLISH")
   cal.add("x-wr-calname", f"Orario UniSR - {corso} (Anno {anno})")
-  
-  # Esempio di struttura pronta per accogliere i dati reali di EasyAcademy
-  # Qui potremo inserire la logica di richieste HTTP verso le API interne di EasyAcademy
   lezioni_esempio = [
     {
       "titolo": f"Lezione Ufficiale {corso}",
@@ -31,20 +27,19 @@ def generate_ics():
       "fine": datetime(2026, 11, 16, 11, 0, 0),
       "aula": "Aula Magna - Campus UniSR"
     }
-]
-
-for lezione in lezioni_esempio:
-  event = icalendar.Event()
-  event.add("summary", lezione["titolo"])
-  event.add("dtstart", lezione["inizio"])
-  event.add("dtend", lezione["fine"])
-  event.add("location", lezione["aula"])
-  event.add("description", f"Orario generato automaticamente per {corso}, Anno {anno}.")
-  cal.add_component(event)
-
-response = Response(cal.to_ical(), mimetype="text/calendar")
-response.headers["Content-Disposition"] = f'attachment; filename="orario_{corso}_anno_{anno}.ics"'
-return response
+  ]
+  for lezione in lezioni_esempio:
+    event = icalendar.Event()
+    event.add("summary", lezione["titolo"])
+    event.add("dtstart", lezione["inizio"])
+    event.add("dtend", lezione["fine"])
+    event.add("location", lezione["aula"])
+    event.add("description", f"Orario generato automaticamente per {corso}, Anno {anno}.")
+    cal.add_component(event)
+  
+  response = Response(cal.to_ical(), mimetype="text/calendar")
+  response.headers["Content-Disposition"] = f'attachment; filename="orario_{corso}_anno_{anno}.ics"'
+  return response
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
