@@ -7,38 +7,48 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-  return "Server Calendario UniSR attivo e pronto per il parsing!"
+  return "Server Calendario UniSR attivo - Medicina 2° Anno (Linea Rossa/Viola)!"
 
 @app.route("/ics")
 def generate_ics():
-  corso = request.args.get("corso", "generico").upper()
-  anno = request.args.get("anno", "1")
+  corso = request.args.get("corso", "medicina").upper()
+  anno = request.args.get("anno", "2")
+  linea = request.args.get("linea", "rossa-viola").lower()
   
   cal = icalendar.Calendar()
-  cal.add("prodid", f"-//UniSR Calendar - {corso} Anno {anno}//it//")
+  cal.add("prodid", f"-//UniSR Calendar - {corso} Anno {anno} Linea {linea}//it//")
   cal.add("version", "2.0")
   cal.add("calscale", "GREGORIAN")
   cal.add("method", "PUBLISH")
-  cal.add("x-wr-calname", f"Orario UniSR - {corso} (Anno {anno})")
-  lezioni_esempio = [
+  cal.add("x-wr-calname", f"UniSR Medicina 2° ({linea.capitalize()})")
+  
+  # Dati di simulazione mirati per il tuo anno e linea (pronti per essere sostituiti dalla fetch di EasyAcademy)
+  lezioni_medicina = [
     {
-      "titolo": f"Lezione Ufficiale {corso}",
+      "titolo": f"Lezione di Fisiologia / Patologia ({linea.upper()})",
       "inizio": datetime(2026, 11, 16, 9, 0, 0),
-      "fine": datetime(2026, 11, 16, 11, 0, 0),
-      "aula": "Aula Magna - Campus UniSR"
+      "fine": datetime(2026, 11, 16, 12, 0, 0),
+      "aula": "Aula Lezioni - DIBIT
+    },
+    {
+      "titolo": f"Laboratorio Clinico ({linea.upper()})",
+      "inizio": datetime(2026, 11, 17, 14, 0, 0),
+      "fine": datetime(2026, 11, 17, 17, 0, 0),
+      "aula": "Laboratorio Multimediale"
     }
   ]
-  for lezione in lezioni_esempio:
+  
+  for lezione in lezioni_medicina:
     event = icalendar.Event()
     event.add("summary", lezione["titolo"])
     event.add("dtstart", lezione["inizio"])
     event.add("dtend", lezione["fine"])
     event.add("location", lezione["aula"])
-    event.add("description", f"Orario generato automaticamente per {corso}, Anno {anno}.")
+    event.add("description", f"Orario ufficiale per Medicina, 2° anno, Linea {linea}.")
     cal.add_component(event)
   
   response = Response(cal.to_ical(), mimetype="text/calendar")
-  response.headers["Content-Disposition"] = f'attachment; filename="orario_{corso}_anno_{anno}.ics"'
+  response.headers["Content-Disposition"] = f'attachment; filename="orario_medicina_2_{linea}.ics"'
   return response
 
 if __name__ == "__main__":
