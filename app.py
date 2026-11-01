@@ -9,9 +9,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-return (
-"Server Calendario UniSR attivo! Usa l'endpoint /ics?corso=...&anno=..."
-)
+return "Server Calendario UniSR attivo! Usa l'endpoint /ics?corso=...&anno=..."
 
 
 @app.route("/ics")
