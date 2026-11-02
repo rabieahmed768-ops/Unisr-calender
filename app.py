@@ -24,21 +24,16 @@ def scarica_orari_da_unisr(corso, anno, linea):
         
         if risposta.status_code == 200:
             soup = BeautifulSoup(risposta.text, 'html.parser')
-            
-            # Cerca tutti i blocchi o le celle della tabella degli orari di EasyAcademy
-            # Solitamente gli eventi sono dentro a celle con classi specifiche o tabelle
             righe = soup.find_all('tr')
             
             contatore = 0
             for row in righe:
                 testo_riga = row.get_text(separator=" | ", strip=True)
                 
-                # Filtriamo in base alla linea scelta (es. se chiedi "rossa", cerchiamo riferimenti alla linea rossa o evitiamo la viola)
+                # Filtro corretto senza errori di sintassi
                 if linea.lower() in testo_riga.lower() or "linea" not in testo_riga.lower():
-                    if any(parola in testo_riga.lower() for in [ "lezione", "docente", "aula", "corso" ] or len(testo_riga) > 30):
+                    if any(parola in testo_riga.lower() for parola in ["lezione", "docente", "aula", "corso"]) or len(testo_riga) > 30:
                         contatore += 1
-                        
-                        # Creiamo un orario coerente basato sul giorno corrente per evitare sfasamenti
                         data_base = datetime.now() + timedelta(days=contatore)
                         
                         eventi.append({
@@ -49,7 +44,6 @@ def scarica_orari_da_unisr(corso, anno, linea):
                             "aula": "Aula Campus UniSR"
                         })
             
-            # Fallback se la tabella ha una struttura grafica particolare
             if not eventi:
                 oggi = datetime.now()
                 eventi.append({
@@ -73,7 +67,7 @@ def home():
 def generate_ics():
     corso = request.args.get("corso", "medicina")
     anno = request.args.get("anno", "2")
-    linea = request.args.get("linea", "rossa") # Legge quale linea vuoi visualizzare
+    linea = request.args.get("linea", "rossa")
     
     cal = icalendar.Calendar()
     cal.add("prodid", f"-//UniSR Calendar - {corso} Anno {anno}//it//")
@@ -82,7 +76,6 @@ def generate_ics():
     cal.add("method", "PUBLISH")
     cal.add("x-wr-calname", f"UniSR Medicina 2° ({linea.capitalize()})")
 
-    # Passa la linea alla funzione di estrazione
     lezioni = scarica_orari_da_unisr(corso, anno, linea)
 
     for lezione in lezioni:
